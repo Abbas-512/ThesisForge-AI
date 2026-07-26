@@ -1,0 +1,6 @@
+{
+  "name": "ThesisForge AI",
+  "description": "AI-powered final-year project plan generator",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
