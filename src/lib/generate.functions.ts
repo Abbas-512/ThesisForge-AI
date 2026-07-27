@@ -30,7 +30,7 @@ export const generateModule = createServerFn({ method: "POST" })
     const timeoutMs = 60000;
     const timeoutPromise = new Promise<never>((_, reject) => {
       setTimeout(
-        () => reject(new Error("AI request timed out after 30 seconds. Please try again.")),
+        () => reject(new Error("AI request timed out after 60 seconds. Please try again.")),
         timeoutMs,
       );
     });
