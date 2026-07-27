@@ -1,118 +1,262 @@
 # ThesisForge AI
 
-ThesisForge AI is an intelligent assistant designed to transform final-year (capstone) project ideas into comprehensive, structured project plans for university students.
+An AI-powered web application that helps university students generate complete Final Year Project (FYP) documentation using Generative AI.
 
 ---
 
-## Features
+# Problem Statement
 
-ThesisForge AI generates 9 specialized planning modules for any capstone concept:
+Preparing Final Year Project documentation is one of the most time-consuming tasks for university students. Students often spend days writing project analysis, objectives, requirements, database planning, timelines, and feasibility reports before they can even begin development.
 
-1. **AI Project Analysis**: Scope assessment, strengths, risks, and refinements.
-2. **Objectives Generator**: Specific, measurable primary and secondary objectives.
-3. **Functional Requirements**: Clear, testable system requirement statements.
-4. **Non-Functional Requirements**: Measurable criteria for performance, security, usability, and maintainability.
-5. **Technology Stack**: Recommended layers, alternative trade-offs, and learning curve notes.
-6. **Database Planning**: Core entities, relationships, constraints, and data volume notes.
-7. **Development Timeline**: Week-by-week term breakdown with key milestones.
-8. **Feasibility Score**: AI-scored evaluation (0–100) with rating band and detailed justification.
-9. **Supervisor Feedback**: Simulated academic supervisor review and key examiner questions.
+**ThesisForge AI** solves this problem by automatically generating well-structured academic project documentation from a simple project description. The platform acts as an intelligent documentation assistant, helping students prepare professional project reports quickly while still allowing them to edit and refine the generated content.
+
+The application is designed for undergraduate students preparing capstone or Final Year Projects.
 
 ---
 
-## Tech Stack
+# Live Demo
 
-- **Framework**: React 19 + TanStack Start (SSR & Server Functions) + TanStack Router
-- **Build Tool**: Vite
-- **Styling**: Tailwind CSS v4 + Lucide Icons + Sonner Toasts
-- **Language**: TypeScript
-- **AI Integration**: Official `@google/genai` SDK (`gemini-3.6-flash`)
+**Live Application**
+
+https://thesis-forge-ai-five.vercel.app/
 
 ---
 
-## Getting Started
+# Features
 
-### Prerequisites
+- AI-powered Project Analysis
+- Automatic Project Objectives Generation
+- Functional Requirements Generator
+- Non-Functional Requirements Generator
+- Technology Stack Recommendation
+- Database Planning
+- Development Timeline Generation
+- AI-powered Feasibility Score
+- Virtual Supervisor Feedback
+- Markdown-based Documentation Rendering
+- Export Generated Documentation
+- Progress Tracking Across Documentation Modules
+- Responsive User Interface
+- Error Handling for AI Requests
 
-- Node.js 18+
-- npm or pnpm / bun
+---
 
-### 1. Installation
+# AI Feature
+
+ThesisForge AI integrates Google's Gemini AI to automatically generate software engineering documentation.
+
+Users provide:
+
+- Project Title
+- Project Domain
+- Project Idea
+- Project Constraints
+
+The application then generates multiple documentation modules using carefully engineered system prompts.
+
+Generated modules include:
+
+- AI Project Analysis
+- Project Objectives
+- Functional Requirements
+- Non-Functional Requirements
+- Technology Stack Recommendation
+- Database Planning
+- Development Timeline
+- Feasibility Assessment
+- Supervisor Feedback
+
+---
+
+# AI System Prompt
+
+Each documentation module uses its own dedicated system prompt.
+
+Example:
+
+> You are ThesisForge AI, an expert final-year (capstone) project advisor for university students. Write in clear, academic English and generate structured software engineering documentation in GitHub-flavoured Markdown. Every module should be concise, practical, and suitable for an undergraduate Final Year Project.
+
+Different prompts are used for each module to generate specialized documentation such as project objectives, database plans, timelines, feasibility analysis, and supervisor feedback.
+
+---
+
+# Technologies Used
+
+## Frontend
+
+- React
+- TypeScript
+- TanStack Router
+- TanStack Start
+- Tailwind CSS
+- shadcn/ui
+- Lucide React Icons
+
+## Backend
+
+- TanStack Server Functions
+- Node.js
+
+## AI
+
+- Google Gemini API
+- Gemini Flash Model
+- Google AI Studio
+
+## Deployment
+
+- Vercel
+
+## Development Tools
+
+- Visual Studio Code
+- Git
+- GitHub
+- npm
+
+---
+
+# Project Screenshots
+
+## Home Page
+
+![Home Page](public/Screenshots/Homepage.PNG)
+
+---
+
+## New Project Form
+
+![New Project](public/Screenshots/New%20project%20form.PNG)
+
+---
+
+## Workspace
+
+![Workspace](public/Screenshots/Workflow.PNG)
+
+---
+
+## Generated Documentation
+
+![Generated Documentation](public/Screenshots/output%20generation.PNG)
+
+---
+
+# How to Run the Project
+
+Clone the repository
 
 ```bash
-git clone https://github.com/Abbas-512/thesis-plan-forge.git
-cd thesis-plan-forge
+git clone https://github.com/Abbas-512/ThesisForge-AI.git
+```
+
+Move into the project directory
+
+```bash
+cd ThesisForge-AI
+```
+
+Install dependencies
+
+```bash
 npm install
 ```
 
-### 2. Environment Variables
-
-Create a `.env` file in the project root based on `.env.example`:
+Create a `.env` file inside the project root and add your Google Gemini API key
 
 ```env
-GEMINI_API_KEY=your_gemini_api_key_here
+GEMINI_API_KEY= YOUR_API_KEY  
+
+"Enter a valid API key if running on local host as it has not been committed in git / vercel app however is working with free-tier Google AI-studio generated key"
+
 ```
 
-Get a free Gemini API key from [Google AI Studio](https://aistudio.google.com/).
-
-### 3. Development Server
-
-Start the local development server:
+Start the development server
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-### 4. Production Build
-
-To test the production build locally:
+Build for production
 
 ```bash
 npm run build
-npm run preview
 ```
 
 ---
 
-## Deployment (Vercel)
+# Project Structure
 
-This project is built with TanStack Start and standard Vite/Node server functions, making it fully ready for Vercel deployment:
-
-1. Push your repository to GitHub.
-2. Import the project in [Vercel](https://vercel.com).
-3. Set the Environment Variable:
-   - `GEMINI_API_KEY`: Your Google Gemini API Key
-4. Deploy!
+```
+src/
+│
+├── components/
+├── lib/
+├── routes/
+├── styles/
+└── server/
+```
 
 ---
 
-## Project Structure
+# Known Limitations
 
-```
-.
-├── .env.example              # Environment variables template
-├── README.md                 # Project documentation
-├── components.json           # UI components config
-├── package.json              # Dependencies and scripts
-├── src/
-│   ├── components/           # UI and Markdown rendering components
-│   │   ├── markdown.tsx
-│   │   └── ui/               # Radix / Tailwind UI elements
-│   ├── lib/                  # Utilities, prompts, and server functions
-│   │   ├── generate.functions.ts  # TanStack Server Function calling @google/genai
-│   │   ├── prompts.server.ts     # System prompts for all 9 modules
-│   │   ├── modules.ts            # Shared module definitions
-│   │   ├── project-store.ts      # Client session state
-│   │   └── export-plan.ts        # Printable PDF export generator
-│   ├── routes/               # TanStack Router page routes
-│   │   ├── __root.tsx        # Root layout & shell
-│   │   ├── index.tsx         # Landing page
-│   │   ├── new-project.tsx   # Project setup form
-│   │   └── workspace.tsx     # Planning workspace & module generator
-│   ├── router.tsx            # Router configuration
-│   ├── server.ts            # SSR entry point
-│   └── styles.css            # Global CSS with Tailwind setup
-└── vite.config.ts            # Vite configuration
-```
+This project uses the **Google Gemini API (Google AI Studio Free Tier)**.
+
+The free-tier API is subject to request and quota limits imposed by Google. During periods of heavy usage or when many documentation modules are generated consecutively, the API may temporarily return an **HTTP 429 (Too Many Requests / Resource Exhausted)** response.
+
+This limitation originates from the external AI service rather than the application itself.
+
+### Recommended Usage
+
+- Generate documentation modules individually for the most reliable experience.
+- If a temporary quota limit is reached, wait a few minutes before retrying.
+- For production deployments, a paid Gemini API plan or another AI provider with higher request quotas is recommended.
+
+---
+
+# Security
+
+- API keys are **never** committed to the repository.
+- Environment variables are used for sensitive credentials.
+- `.env` files are excluded using `.gitignore`.
+- The deployed application securely accesses the Gemini API through server-side functions.
+
+---
+
+# Future Improvements
+
+- User Authentication
+- Multiple Project Management
+- Project History
+- PDF Export
+- DOCX Export
+- Supervisor Collaboration
+- Cloud Database Integration
+- Additional Documentation Modules
+- Support for Multiple AI Providers
+- Custom Prompt Templates
+
+---
+
+# Repository
+
+GitHub Repository
+
+https://github.com/Abbas-512/ThesisForge-AI.git
+
+---
+
+# Author
+
+**Syed Hasnain Abbas Shah Zaidi**
+
+University of Gujrat (BSIT batch:2020 - 2024)
+
+Individual Academic Project
+
+---
+
+# License
+
+This project was developed solely for educational purposes as an individual university assignment.
