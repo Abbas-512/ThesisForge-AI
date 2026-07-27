@@ -510,7 +510,11 @@ function Workspace() {
     setGeneratingAll(true);
     for (const m of MODULES) {
       if (statuses[m.id] === "success") continue;
+
       await runGenerate(m.id);
+
+      // Wait 3 seconds before calling Gemini again.
+      await new Promise((resolve) => setTimeout(resolve, 5000));
     }
     setGeneratingAll(false);
     toast.success("All modules generated");
