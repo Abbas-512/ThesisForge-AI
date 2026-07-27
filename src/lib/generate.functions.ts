@@ -12,98 +12,111 @@ const InputSchema = z.object({
   }),
 });
 
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export const generateModule = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => InputSchema.parse(input))
   .handler(async ({ data }): Promise<ModuleResult> => {
-    try {
-      const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY;
 
-      if (!apiKey) {
-        throw new Error("GEMINI_API_KEY is not configured in environment variables.");
-      }
-
-      const { GoogleGenAI } = await import("@google/genai");
-      const {
-        MODULE_PROMPTS,
-        buildUserPrompt,
-        parseFeasibility,
-      } = await import("./prompts.server");
-
-      const ai = new GoogleGenAI({
-        apiKey,
-      });
-
-      const timeoutMs = 60000;
-
-      const timeoutPromise = new Promise<never>((_, reject) => {
-        setTimeout(() => {
-          reject(
-            new Error(
-              "AI request timed out after 60 seconds. Please try again."
-            )
-          );
-        }, timeoutMs);
-      });
-
-      console.log("========== GENERATE ==========");
-      console.log("Module:", data.moduleId);
-      console.log("Using model:", "gemini-flash-latest");
-
-      const generatePromise = ai.models.generateContent({
-        model: "gemini-flash-latest",
-        contents: buildUserPrompt(data.project),
-        config: {
-          systemInstruction: MODULE_PROMPTS[data.moduleId],
-          temperature: data.moduleId === "feasibility" ? 0.2 : 0.5,
-          ...(data.moduleId === "feasibility"
-            ? { responseMimeType: "application/json" }
-            : {}),
-        },
-      });
-
-      const response = await Promise.race([
-        generatePromise,
-        timeoutPromise,
-      ]);
-
-      const text = response.text ?? "";
-
-      if (data.moduleId === "feasibility") {
-        return {
-          kind: "feasibility",
-          feasibility: parseFeasibility(text),
-        };
-      }
-
-      return {
-        kind: "markdown",
-        markdown: text.trim(),
-      };
-    } catch (error: any) {
-      console.error("====================================");
-      console.error("GEMINI ERROR");
-      console.error("====================================");
-      console.error(error);
-
-      if (error?.message) {
-        console.error("Message:", error.message);
-      }
-
-      if (error?.status) {
-        console.error("Status:", error.status);
-      }
-
-      if (error?.code) {
-        console.error("Code:", error.code);
-      }
-
-      if (error?.response) {
-        console.error(
-          "Response:",
-          JSON.stringify(error.response, null, 2)
-        );
-      }
-
-      throw error;
+    if (!apiKey) {
+      throw new Error("GEMINI_API_KEY is not configured in environment variables.");
     }
+
+    const { GoogleGenAI } = await import("@google/genai");
+    const {
+      MODULE_PROMPTS,
+      buildUserPrompt,
+      parseFeasibility,
+    } = await import("./prompts.server");
+
+    const ai = new GoogleGenAI({
+      apiKey,
+    });
+
+    const timeoutMs = 60000;
+
+    console.log("================================");
+    console.log("Module:", data.moduleId);
+    console.log("Model :", "gemini-flash-latest");
+    console.log("================================");
+
+    const maxRetries = 5;
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const timeoutPromise = new Promise<never>((_, reject) => {
+          setTimeout(() => {
+            reject(
+              new Error(
+                "AI request timed out after 60 seconds. Please try again."
+              )
+            );
+          }, timeoutMs);
+        });
+
+        const generatePromise = ai.models.generateContent({
+          model: "gemini-flash-latest",
+          contents: buildUserPrompt(data.project),
+          config: {
+            systemInstruction: MODULE_PROMPTS[data.moduleId],
+            temperature: data.moduleId === "feasibility" ? 0.2 : 0.5,
+            ...(data.moduleId === "feasibility"
+              ? { responseMimeType: "application/json" }
+              : {}),
+          },
+        });
+
+        const response = await Promise.race([
+          generatePromise,
+          timeoutPromise,
+        ]);
+
+        const text = response.text ?? "";
+
+        if (data.moduleId === "feasibility") {
+          return {
+            kind: "feasibility",
+            feasibility: parseFeasibility(text),
+          };
+        }
+
+        return {
+          kind: "markdown",
+          markdown: text.trim(),
+        };
+      } catch (error: any) {
+        console.error(
+          `Attempt ${attempt}/${maxRetries} failed for ${data.moduleId}`
+        );
+
+        console.error(error);
+
+        const message =
+          error?.message ??
+          JSON.stringify(error);
+
+        const is429 =
+          message.includes("429") ||
+          message.includes("RESOURCE_EXHAUSTED") ||
+          message.includes("quota") ||
+          message.includes("rate");
+
+        if (is429 && attempt < maxRetries) {
+          const wait = attempt * 5000;
+
+          console.log(`429 detected. Waiting ${wait / 1000}s before retry...`);
+
+          await sleep(wait);
+
+          continue;
+        }
+
+        throw error;
+      }
+    }
+
+    throw new Error("Generation failed after multiple retries.");
   });

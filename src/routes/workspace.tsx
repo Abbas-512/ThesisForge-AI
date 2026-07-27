@@ -466,7 +466,7 @@ function Workspace() {
 
   const message =
     /429|rate limit|resource_exhausted|quota/i.test(raw)
-      ? "Google Gemini has temporarily reached its usage limit. Please wait a minute and try again."
+      ? "AI service temporarily unavailable due to free API quota limits. This project uses the Google Gemini free-tier API, which may temporarily reject requests during periods of high usage. Please wait 1–3 minutes and try again.Google Gemini has temporarily reached its usage limit. Please wait a minute and try again."
 
       : /503|unavailable|overloaded|busy/i.test(raw)
         ? "The AI service is temporarily busy. Please try again in a few moments."
