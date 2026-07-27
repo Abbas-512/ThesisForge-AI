@@ -25,27 +25,23 @@ export const generateModule = createServerFn({ method: "POST" })
 
     const ai = new GoogleGenAI({
       apiKey,
-      httpOptions: {
-        headers: {
-          "User-Agent": "aistudio-build",
-        },
-      },
     });
 
-    const timeoutMs = 30000;
+    const timeoutMs = 60000;
     const timeoutPromise = new Promise<never>((_, reject) => {
       setTimeout(
         () => reject(new Error("AI request timed out after 30 seconds. Please try again.")),
         timeoutMs,
       );
     });
-
+    console.log("========== GENERATE ==========");
+    console.log("Using model:", "gemini-flash-latest");
     const generatePromise = ai.models.generateContent({
-      model: "gemini-3.6-flash",
+      model: "gemini-flash-latest",
       contents: buildUserPrompt(data.project),
       config: {
         systemInstruction: MODULE_PROMPTS[data.moduleId],
-        temperature: data.moduleId === "feasibility" ? 0.2 : 0.7,
+        temperature: data.moduleId === "feasibility" ? 0.2 : 0.5,
         ...(data.moduleId === "feasibility" ? { responseMimeType: "application/json" } : {}),
       },
     });

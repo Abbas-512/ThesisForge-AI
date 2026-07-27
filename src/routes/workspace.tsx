@@ -462,17 +462,35 @@ function Workspace() {
         setStatuses((prev) => ({ ...prev, [id]: "success" }));
         return true;
       } catch (err) {
-        const raw = err instanceof Error ? err.message : String(err);
-        const message = /429|rate limit/i.test(raw)
-          ? "The AI service is rate limited right now — wait a moment before retrying."
-          : /GEMINI_API_KEY|not configured/i.test(raw)
-            ? "GEMINI_API_KEY is not configured in environment variables."
-            : /timed out/i.test(raw)
-              ? "AI generation timed out after 30 seconds. Please try again."
-              : raw || "The AI service didn't respond. Please try again.";
-        setErrors((prev) => ({ ...prev, [id]: message }));
-        setStatuses((prev) => ({ ...prev, [id]: "error" }));
-        return false;
+  const raw = err instanceof Error ? err.message : String(err);
+
+  const message =
+    /429|rate limit|resource_exhausted|quota/i.test(raw)
+      ? "Google Gemini has temporarily reached its usage limit. Please wait a minute and try again."
+
+      : /503|unavailable|overloaded|busy/i.test(raw)
+        ? "The AI service is temporarily busy. Please try again in a few moments."
+
+        : /GEMINI_API_KEY|not configured/i.test(raw)
+          ? "GEMINI_API_KEY is not configured in environment variables."
+
+          : /timed out/i.test(raw)
+            ? "AI generation timed out after 60 seconds. Please try again."
+
+            : raw ||
+              "An unexpected AI error occurred. Please try again.";
+
+  setErrors((prev) => ({
+    ...prev,
+    [id]: message,
+  }));
+
+  setStatuses((prev) => ({
+    ...prev,
+    [id]: "error",
+  }));
+
+  return false;
       } finally {
         inFlight.current.delete(id);
       }
